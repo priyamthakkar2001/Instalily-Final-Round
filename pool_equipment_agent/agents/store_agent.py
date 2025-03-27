@@ -55,9 +55,6 @@ class StoreAgent(BaseAgent):
             Dictionary with latitude and longitude if successful, None otherwise
         """
         try:
-            # In a production environment, this would call a geocoding API like Google Maps or Nominatim
-            # For now, we'll implement a simple fallback approach for demonstration purposes
-            
             # Check if the query looks like a US ZIP code (5 digits)
             if location_query.isdigit() and len(location_query) == 5:
                 # For demonstration, we'll use a simplified approach to generate coordinates
@@ -74,19 +71,39 @@ class StoreAgent(BaseAgent):
                 logger.info(f"Using approximate coordinates for ZIP {location_query}: {lat_base}, {lng_base}")
                 return {"latitude": lat_base, "longitude": lng_base}
             
-            # For city names, we would normally use a geocoding API
-            # For demonstration, we'll handle a few common cities
-            normalized_query = location_query.lower().strip()
-            if "boston" in normalized_query:
-                return {"latitude": 42.3601, "longitude": -71.0589}
-            elif "new york" in normalized_query or "nyc" in normalized_query:
-                return {"latitude": 40.7128, "longitude": -74.0060}
-            elif "los angeles" in normalized_query or "la" in normalized_query:
-                return {"latitude": 34.0522, "longitude": -118.2437}
-            elif "miami" in normalized_query:
-                return {"latitude": 25.7617, "longitude": -80.1918}
-            elif "chicago" in normalized_query:
-                return {"latitude": 41.8781, "longitude": -87.6298}
+            # Use LLM to determine if this is a city or location and extract its likely coordinates
+            # This approach leverages the LLM's knowledge of geography without requiring an external API
+            # In production, you would use a proper geocoding API instead
+            
+            prompt = f"""You are a geocoding assistant. Given a location name, provide the approximate latitude and longitude coordinates.
+            
+            Location: {location_query}
+            
+            If this is a recognizable city, town, or place in the United States, respond with ONLY a JSON object containing latitude and longitude.
+            If you don't recognize this as a valid location, respond with ONLY the text 'UNKNOWN_LOCATION'.
+            
+            Example response for 'New York': {{"latitude": 40.7128, "longitude": -74.0060}}
+            """
+            
+            from pool_equipment_agent.llm.gpt4o import GPT4O
+            llm = GPT4O()
+            response = llm.generate(prompt)
+            
+            # Clean and parse the response
+            response = response.strip()
+            if response == "UNKNOWN_LOCATION":
+                logger.info(f"LLM could not recognize location: {location_query}")
+                return None
+                
+            import json
+            try:
+                # Try to parse as JSON
+                coordinates = json.loads(response)
+                if "latitude" in coordinates and "longitude" in coordinates:
+                    logger.info(f"LLM geocoded {location_query} to: {coordinates['latitude']}, {coordinates['longitude']}")
+                    return coordinates
+            except json.JSONDecodeError:
+                logger.error(f"Could not parse LLM geocoding response as JSON: {response}")
             
             # If we can't geocode, log it and return None
             logger.info(f"Could not geocode location: {location_query}")
