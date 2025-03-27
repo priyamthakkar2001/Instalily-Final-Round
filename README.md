@@ -22,51 +22,50 @@ The system uses a multi-agent architecture with a coordinator-specialist pattern
 ## Project Structure
 
 ```
-.
-u251cu2500u2500 pool_equipment_agent/        # Main application package
-u2502   u251cu2500u2500 api/                  # API integration layer
-u2502   u2502   u251cu2500u2500 __init__.py
-u2502   u2502   u251cu2500u2500 base.py           # Base API client with common functionality
-u2502   u2502   u251cu2500u2500 product_api.py    # Product search and details API wrapper
-u2502   u2502   u251cu2500u2500 store_api.py      # Store location API wrapper
-u2502   u2502   u251cu2500u2500 pricing_api.py    # Pricing API wrapper
-u2502   u2502   u2514u2500u2500 health_api.py     # Health check API wrapper
-u2502   u2502
-u2502   u251cu2500u2500 agents/               # Agent definitions
-u2502   u2502   u251cu2500u2500 __init__.py
-u2502   u2502   u251cu2500u2500 base_agent.py     # Base agent class
-u2502   u2502   u251cu2500u2500 product_agent.py  # Product search agent
-u2502   u2502   u251cu2500u2500 store_agent.py    # Store location agent
-u2502   u2502   u251cu2500u2500 pricing_agent.py  # Pricing agent
-u2502   u2502   u251cu2500u2500 advisor_agent.py  # Technical advisor agent
-u2502   u2502   u2514u2500u2500 coordinator.py    # Agent coordinator using CrewAI
-u2502   u2502
-u2502   u251cu2500u2500 llm/                  # LLM integration
-u2502   u2502   u251cu2500u2500 __init__.py
-u2502   u2502   u251cu2500u2500 gpt4o.py          # GPT-4o client
-u2502   u2502   u251cu2500u2500 prompt_templates.py # Prompt templates for different query types
-u2502   u2502   u2514u2500u2500 query_classifier.py # Query intent classification
-u2502   u2502
-u2502   u251cu2500u2500 messaging/            # Messaging platform integration
-u2502   u2502   u251cu2500u2500 __init__.py
-u2502   u2502   u251cu2500u2500 telegram_bot.py   # Telegram bot implementation
-u2502   u2502   u2514u2500u2500 message_formatter.py # Message formatting utilities
-u2502   u2502
-u2502   u251cu2500u2500 utils/                # Utility functions
-u2502   u2502   u251cu2500u2500 __init__.py
-u2502   u2502   u251cu2500u2500 config.py         # Configuration management
-u2502   u2502   u251cu2500u2500 logger.py         # Logging utilities
-u2502   u2502   u2514u2500u2500 cache.py          # Caching utilities
-u2502   u2502
-u2502   u251cu2500u2500 app.py                # FastAPI application
-u2502   u251cu2500u2500 main.py               # Application entry point
-u2502   u251cu2500u2500 requirements.txt      # Project dependencies
-u2502   u2514u2500u2500 .env.example          # Example environment variables
-u2502
-u251cu2500u2500 .gitignore               # Git ignore file
-u251cu2500u2500 setup.py                 # Package setup file
-u251cu2500u2500 case-study.md            # Case study documentation
-u2514u2500u2500 README.md                # Project documentation
+├── pool_equipment_agent/        # Main application package
+│   ├── api/                     # API integration layer
+│   │   ├── __init__.py
+│   │   ├── base.py              # Base API client with common functionality
+│   │   ├── product_api.py       # Product search and details API wrapper
+│   │   ├── store_api.py         # Store location API wrapper
+│   │   ├── pricing_api.py       # Pricing API wrapper
+│   │   └── health_api.py        # Health check API wrapper
+│   │
+│   ├── agents/                  # Agent definitions
+│   │   ├── __init__.py
+│   │   ├── base_agent.py        # Base agent class
+│   │   ├── product_agent.py     # Product search agent
+│   │   ├── store_agent.py       # Store location agent
+│   │   ├── pricing_agent.py     # Pricing agent
+│   │   ├── advisor_agent.py     # Technical advisor agent
+│   │   └── coordinator.py       # Agent coordinator using CrewAI
+│   │
+│   ├── llm/                     # LLM integration
+│   │   ├── __init__.py
+│   │   ├── gpt4o.py             # GPT-4o client
+│   │   ├── prompt_templates.py  # Prompt templates for different query types
+│   │   └── query_classifier.py  # Query intent classification
+│   │
+│   ├── messaging/               # Messaging platform integration
+│   │   ├── __init__.py
+│   │   ├── telegram_bot.py      # Telegram bot implementation
+│   │   └── message_formatter.py # Message formatting utilities
+│   │
+│   ├── utils/                   # Utility functions
+│   │   ├── __init__.py
+│   │   ├── config.py            # Configuration management
+│   │   ├── logger.py            # Logging utilities
+│   │   └── cache.py             # Caching utilities
+│   │
+│   ├── app.py                   # FastAPI application
+│   ├── main.py                  # Application entry point
+│   ├── requirements.txt         # Project dependencies
+│   └── .env.example             # Example environment variables
+│
+├── .gitignore                   # Git ignore file
+├── setup.py                     # Package setup file
+├── case-study.md                # Case study documentation
+└── README.md                    # Project documentation
 ```
 
 ## Setup Instructions
