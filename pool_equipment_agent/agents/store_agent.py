@@ -83,6 +83,10 @@ class StoreAgent(BaseAgent):
                 return {"latitude": 40.7128, "longitude": -74.0060}
             elif "los angeles" in normalized_query or "la" in normalized_query:
                 return {"latitude": 34.0522, "longitude": -118.2437}
+            elif "miami" in normalized_query:
+                return {"latitude": 25.7617, "longitude": -80.1918}
+            elif "chicago" in normalized_query:
+                return {"latitude": 41.8781, "longitude": -87.6298}
             
             # If we can't geocode, log it and return None
             logger.info(f"Could not geocode location: {location_query}")
