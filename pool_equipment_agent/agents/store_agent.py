@@ -75,35 +75,41 @@ class StoreAgent(BaseAgent):
             # This approach leverages the LLM's knowledge of geography without requiring an external API
             # In production, you would use a proper geocoding API instead
             
-            prompt = f"""You are a geocoding assistant. Given a location name, provide the approximate latitude and longitude coordinates.
-            
-            Location: {location_query}
-            
-            If this is a recognizable city, town, or place in the United States, respond with ONLY a JSON object containing latitude and longitude.
-            If you don't recognize this as a valid location, respond with ONLY the text 'UNKNOWN_LOCATION'.
-            
-            Example response for 'New York': {{"latitude": 40.7128, "longitude": -74.0060}}
-            """
-            
             from pool_equipment_agent.llm.gpt4o import GPT4O
-            llm = GPT4O()
-            response = llm.generate(prompt)
+            from pool_equipment_agent.utils.model_context import ModelContext, Message
             
-            # Clean and parse the response
-            response = response.strip()
-            if response == "UNKNOWN_LOCATION":
-                logger.info(f"LLM could not recognize location: {location_query}")
-                return None
-                
-            import json
+            prompt = f"You are a geocoding assistant. Given a location name, provide the approximate latitude and longitude coordinates.\n\nLocation: {location_query}\n\nIf this is a recognizable city, town, or place in the United States, respond with ONLY a JSON object containing latitude and longitude.\nIf you don't recognize this as a valid location, respond with ONLY the text 'UNKNOWN_LOCATION'.\n\nExample response for 'New York': {{\"latitude\": 40.7128, \"longitude\": -74.0060}}"
+            
+            # Create a proper ModelContext object
+            context = ModelContext(
+                messages=[
+                    Message(role="system", content="You are a geocoding assistant that provides latitude and longitude coordinates for locations."),
+                    Message(role="user", content=prompt)
+                ],
+                parameters={"temperature": 0.1}  # Lower temperature for more deterministic results
+            )
+            
+            llm = GPT4O()
             try:
-                # Try to parse as JSON
-                coordinates = json.loads(response)
-                if "latitude" in coordinates and "longitude" in coordinates:
-                    logger.info(f"LLM geocoded {location_query} to: {coordinates['latitude']}, {coordinates['longitude']}")
-                    return coordinates
-            except json.JSONDecodeError:
-                logger.error(f"Could not parse LLM geocoding response as JSON: {response}")
+                response = llm.generate(context)
+                
+                # Clean and parse the response
+                response = response.strip()
+                if response == "UNKNOWN_LOCATION":
+                    logger.info(f"LLM could not recognize location: {location_query}")
+                    return None
+                    
+                import json
+                try:
+                    # Try to parse as JSON
+                    coordinates = json.loads(response)
+                    if "latitude" in coordinates and "longitude" in coordinates:
+                        logger.info(f"LLM geocoded {location_query} to: {coordinates['latitude']}, {coordinates['longitude']}")
+                        return coordinates
+                except json.JSONDecodeError:
+                    logger.error(f"Could not parse LLM geocoding response as JSON: {response}")
+            except Exception as e:
+                logger.error(f"Error using LLM for geocoding: {str(e)}")
             
             # If we can't geocode, log it and return None
             logger.info(f"Could not geocode location: {location_query}")
